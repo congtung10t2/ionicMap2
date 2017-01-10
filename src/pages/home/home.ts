@@ -1,6 +1,7 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 
-import { NavController } from 'ionic-angular';
+import { NavController, ModalController, NavParams } from 'ionic-angular';
+import { SearchListPage } from '../search-list/search-list';
 
 declare var google;
 @Component({
@@ -8,17 +9,37 @@ declare var google;
     templateUrl: 'home.html'
 })
 export class HomePage {
+  searchBox: any;
   @ViewChild('map') mapElement: ElementRef;
   map: any;
-  constructor(public navCtrl: NavController) {
-    
+  constructor(public navCtrl: NavController, params: NavParams) {
   }
+
   ionViewDidLoad() {
-      this.loadMap();
+    this.loadMap();
   }
-  
+
+  openFilters() {
+    var that = this;
+    this.navCtrl.push(SearchListPage, {
+    callback: function(_params) {
+          if(typeof _params == "undefined")
+          return;
+          var latLong = new google.maps.LatLng(_params.latitude, _params.longtitude);
+          var marker = new google.maps.Marker({
+            position: latLong
+          });
+          marker.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
+          marker.setMap(that.map);
+          that.map.setCenter(marker.getPosition());
+          return new Promise((resolve, reject) => {
+             resolve();
+          });
+      }
+    });
+  }
   loadMap() {
-    let latLng = new google.maps.LatLng(16.0397912, 108.2254014);
+    var latLng = new google.maps.LatLng(16.0397912, 108.2254014);
     let mapOptions = {
         center: latLng,
         zoom: 15,

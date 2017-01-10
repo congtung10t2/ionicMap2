@@ -3,10 +3,18 @@
         <button ion-button menuToggle>
             <ion-icon name="menu"></ion-icon>
         </button>
-        <ion-title>Home page</ion-title>
+    <label class="item-input-wrapper">
+        <i class="icon ion-ios7-search placeholder-icon"></i>
+        <input type="search" (click)='openFilters();' placeholder="Search">
+    </label>
     </ion-navbar>
 </ion-header>
 
+<div class="bar bar-header">
+  <button class="button button-icon icon ion-navicon"></button>
+  <div class="h1 title">Header Buttons</div>
+  <button class="button button-clear button-positive">Edit</button>
+</div>
 <ion-content>
     <div #map id="map"></div>
 </ion-content>
