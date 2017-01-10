@@ -45,6 +45,7 @@ export class MyApp {
         var marker = new google.maps.Marker({
             position: latLong
         });
+        marker.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
         marker.setMap(map);
         map.setCenter(marker.getPosition());
         }
