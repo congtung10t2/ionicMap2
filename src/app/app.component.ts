@@ -5,20 +5,27 @@ import { StatusBar, Splashscreen } from 'ionic-native';
 import { HomePage } from '../pages/home/home';
 
 declare var google;
+var directionsService;
+var directionsDisplay;
 @Component({
   templateUrl: 'app.html'
 })
 export class MyApp {
+    
     @ViewChild(Nav) nav: Nav;
 
     rootPage: any = HomePage;
 
     pages: Array<{ title: string, component: any }>;
+    curPos: any = undefined;
+    defPos: any = undefined;
 
   constructor(platform: Platform) {
     this.pages = [
         { title: 'current_location', component: 1 },
-        { title: 'default location', component: 2 }
+        { title: 'default location', component: 2 },
+        { title: 'default location 2', component: 3 },
+        { title: 'calculation', component: 4 }
      ];
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
@@ -26,6 +33,7 @@ export class MyApp {
       StatusBar.styleDefault();
       Splashscreen.hide();
     });
+    directionsService = new google.maps.DirectionsService();
   }
   onFunction(numb) {
      var mapOptions = {
@@ -40,14 +48,14 @@ export class MyApp {
       case 1:
         var setCurrentPos = function(latitude, longitude){
        
-        var latLong = new google.maps.LatLng(latitude, longitude);
+        var latLong = new google.maps.LatLng(16.0473009,108.2230078);
 
-        var marker = new google.maps.Marker({
+        var curPos = new google.maps.Marker({
             position: latLong
         });
-        marker.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
-        marker.setMap(map);
-        map.setCenter(marker.getPosition());
+        curPos.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
+        curPos.setMap(map);
+        map.setCenter(curPos.getPosition());
         }
         var onMapSuccess = function (position) {
             var Latitude = position.coords.latitude;
@@ -61,15 +69,46 @@ export class MyApp {
         navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: false });
         break;
     
-      default:
+      case 2:
         var latLong = new google.maps.LatLng(16.0397912, 108.2254014);
 
-        var marker = new google.maps.Marker({
+        this.defPos = new google.maps.Marker({
             position: latLong
         });
-        marker.setMap(map);
-        map.setCenter(marker.getPosition());
+        this.defPos.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
+        this.defPos.setMap(map);
+        map.setCenter(this.defPos.getPosition());
         break;
+      case 3:
+        var latLong = new google.maps.LatLng(16.0473009,108.2230078);
+
+        this.curPos = new google.maps.Marker({
+            position: latLong
+        });
+        this.curPos.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
+        this.curPos.setMap(map);
+        map.setCenter(this.curPos.getPosition());
+        break;
+      default:
+        if (this.defPos != undefined && this.curPos != undefined) {
+            directionsDisplay = new google.maps.DirectionsRenderer();
+
+            directionsDisplay.setMap(map);    
+            var request = {
+                origin:this.curPos.getPosition(),
+                destination:this.defPos.getPosition(),
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+            directionsService.route(request, function(response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                  directionsDisplay.setDirections(response);
+                }
+            });
+        } else {
+          alert("marker didn't set")
+        }
+        break;
+      
     }
       // Reset the content nav to have just this page
       // we wouldn't want the back button to show in this scenario
