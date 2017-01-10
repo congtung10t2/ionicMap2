@@ -62,7 +62,13 @@ export class MyApp {
         break;
     
       default:
-        map.setCenter(new google.maps.LatLng(-34.9290, 138.6010));
+        var latLong = new google.maps.LatLng(16.0397912, 108.2254014);
+
+        var marker = new google.maps.Marker({
+            position: latLong
+        });
+        marker.setMap(map);
+        map.setCenter(marker.getPosition());
         break;
     }
       // Reset the content nav to have just this page
