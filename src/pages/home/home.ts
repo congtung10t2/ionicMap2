@@ -10,35 +10,157 @@ declare var google;
 })
 export class HomePage {
   searchBox: any;
+  styleIndex;
+  styles: any;
+  beforePos: any;
+  lastPos: any;
   @ViewChild('map') mapElement: ElementRef;
   map: any;
   constructor(public navCtrl: NavController, params: NavParams) {
+      this.styleIndex = 0;
+      this.styles = [
+        "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png",
+        "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
+      ];
   }
 
   ionViewDidLoad() {
     this.loadMap();
   }
 
-  openFilters() {
+  currentLocation(){
+    var that = this;
+    var setCurrentPos = function(latitude, longitude){
+        var latLong = new google.maps.LatLng(latitude, longitude);
+        var curPos = new google.maps.Marker({
+            position: latLong
+        });
+        curPos.setMap(that.map);
+        that.map.setCenter(curPos.getPosition());
+    }
+    var onMapSuccess = function (position) {
+        var Latitude = position.coords.latitude;
+        var Longitude = position.coords.longitude;
+        setCurrentPos(Latitude, Longitude);
+    }
+    var onMapError =  function(error) {
+        console.log('code: ' + error.code + '\n' +
+        'message: ' + error.message + '\n');
+    }
+    navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: false });
+  }
+
+  setTargetLocation(){
+        var curPos = new google.maps.Marker({
+            position: this.map.getCenter()
+        });
+        curPos.setIcon(this.styles[this.styleIndex]);
+        curPos.setMap(this.map);
+  }
+  
+  changeStyleOfMarker(){
+    if(this.styleIndex < this.styles.length){
+        this.styleIndex++;
+    }
+    else 
+        this.styleIndex = 0;
+  }
+
+  openStart() {
     var that = this;
     this.navCtrl.push(SearchListPage, {
     callback: function(_params) {
           if(typeof _params == "undefined")
           return;
-          var latLong = new google.maps.LatLng(_params.latitude, _params.longtitude);
+          var latLng = new google.maps.LatLng(_params.latitude, _params.longtitude);
+          let mapOptions = {
+              center: latLng,
+              zoom: 15,
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+          }
+          that.beforePos = latLng;
           var marker = new google.maps.Marker({
-            position: latLong
+            position: latLng
           });
-          marker.setIcon('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png');
+          marker.setIcon(that.styles[that.styleIndex]);
           marker.setMap(that.map);
           that.map.setCenter(marker.getPosition());
+          document.getElementById("startInput").innerHTML = "abc";
           return new Promise((resolve, reject) => {
              resolve();
           });
       }
     });
   }
-  loadMap() {
+
+  openEnd() {
+    var that = this;
+    this.navCtrl.push(SearchListPage, {
+    callback: function(_params) {
+          if(typeof _params == "undefined")
+          return;
+          var latLng = new google.maps.LatLng(_params.latitude, _params.longtitude);
+          let mapOptions = {
+              center: latLng,
+              zoom: 15,
+              mapTypeId: google.maps.MapTypeId.ROADMAP
+          }
+          that.lastPos = latLng;
+          var marker = new google.maps.Marker({
+            position: latLng
+          });
+          marker.setIcon(that.styles[that.styleIndex]);
+          marker.setMap(that.map);
+          that.map.setCenter(marker.getPosition());
+          document.getElementById("startInput").innerHTML = "abc";
+          return new Promise((resolve, reject) => {
+             resolve();
+          });
+      }
+    });
+  }
+
+  calculate(){
+      this.calculateBetweenPoint(this.beforePos, this.lastPos);
+  }
+
+  calculateBetweenPoint(pos1, pos2){
+    var directionsService = new google.maps.DirectionsService();
+    var directionsDisplay = new google.maps.DirectionsRenderer(); 
+    directionsDisplay.setMap(this.map);    
+    var request = {
+        origin:pos1,
+        destination:pos2,
+        travelMode: google.maps.TravelMode.DRIVING
+    };
+    directionsService.route(request, function(response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setDirections(response);
+        }
+    });
+    var service = new google.maps.DistanceMatrixService();
+    service.getDistanceMatrix({
+        origins: [pos1],
+        destinations: [pos2],
+        travelMode: google.maps.TravelMode.DRIVING,
+        unitSystem: google.maps.UnitSystem.METRIC,
+        avoidHighways: false,
+        avoidTolls: false
+    }, function (response, status) {
+        if (status == google.maps.DistanceMatrixStatus.OK && response.rows[0].elements[0].status != "ZERO_RESULTS") {
+            var distance = response.rows[0].elements[0].distance.text;
+            var duration = response.rows[0].elements[0].duration.text;
+            var dvDistance = document.getElementById("distance");
+            dvDistance.innerHTML = "Distance: " + distance;
+            var dvDuration = document.getElementById("duration");
+            dvDuration.innerHTML = "Duration: " + duration;
+
+        } else {
+        }
+    });
+  }
+
+  loadMap() { 
     var latLng = new google.maps.LatLng(16.0397912, 108.2254014);
     let mapOptions = {
         center: latLng,
@@ -46,5 +168,6 @@ export class HomePage {
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
     this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+    
   }
 }

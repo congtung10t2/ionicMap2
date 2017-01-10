@@ -5,7 +5,8 @@
         </button>
     <label class="item-input-wrapper">
         <i class="icon ion-ios7-search placeholder-icon"></i>
-        <input type="search" (click)='openFilters();' placeholder="Search">
+        <input id="startInput" type="search" (click)='openStart();' placeholder="Start">
+        <input id="endInput" type="search" (click)='openEnd();' placeholder="Target">
     </label>
     </ion-navbar>
 </ion-header>
@@ -16,5 +17,19 @@
   <button class="button button-clear button-positive">Edit</button>
 </div>
 <ion-content>
+    <div class = "tabs">
+        <button ion-button (click)='currentLocation();'>now</button>
+            
+        <button ion-button (click)='setTargetLocation();'>add marker</button>
+            
+        <button ion-button (click)='changeStyleOfMarker();'>change marker style</button>
+
+        <button ion-button (click)='calculate();'>calculate</button>
+    </div>
+    <div class = "show">
+        
+        <ion-label id="distance">Distance: </ion-label>
+        <ion-label id="duration">Duration: </ion-label>
+    </div>
     <div #map id="map"></div>
 </ion-content>
