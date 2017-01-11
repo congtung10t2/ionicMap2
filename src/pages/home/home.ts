@@ -193,7 +193,8 @@ export class HomePage {
         zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
-    this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+    var div = document.getElementById("map");
+    this.map = plugin.google.maps.Map.getMap(div);
     
   }
 }
