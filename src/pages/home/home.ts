@@ -2,7 +2,14 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 
 import { NavController, ModalController, NavParams } from 'ionic-angular';
 import { SearchListPage } from '../search-list/search-list';
-import {Camera, ImagePicker} from 'ionic-native';
+import {Camera, 
+ ImagePicker,
+ GoogleMap,
+ GoogleMapsEvent,
+ GoogleMapsLatLng,
+ CameraPosition,
+ GoogleMapsMarkerOptions,
+ GoogleMapsMarker} from 'ionic-native';
 
 declare var google;
 @Component({
@@ -53,11 +60,15 @@ export class HomePage {
   }
 
   setTargetLocation(){
-        var curPos = new google.maps.Marker({
-            position: this.map.getCenter()
-        });
-        curPos.setIcon(this.styles[this.styleIndex]);
-        curPos.setMap(this.map);
+    let markerOptions: GoogleMapsMarkerOptions = {
+        position: this.map.getCameraPosition(),
+        title: 'Ionic',
+        icon: this.styles[this.styleIndex]
+    };
+    this.map.addMarker(markerOptions)
+    .then((marker: GoogleMapsMarker) => {
+        marker.showInfoWindow();
+    });
   }
 
   takePicture(){
@@ -98,20 +109,23 @@ export class HomePage {
     callback: function(_params) {
           if(typeof _params == "undefined")
           return;
-          var latLng = new google.maps.LatLng(_params.latitude, _params.longtitude);
-          let mapOptions = {
-              center: latLng,
-              zoom: 15,
-              mapTypeId: google.maps.MapTypeId.ROADMAP
-          }
+          let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(_params.latitude, _params.longtitude);
+          let position: CameraPosition = {
+                target: latLng,
+                zoom: 18,
+                tilt: 30
+          };
           that.beforePos = latLng;
-          var marker = new google.maps.Marker({
-            position: latLng
+          let markerOptions: GoogleMapsMarkerOptions = {
+                position: this.map.getCameraPosition(),
+                title: 'Ionic',
+                icon: this.styles[this.styleIndex]
+          };
+          that.map.addMarker(markerOptions)
+          .then((marker: GoogleMapsMarker) => {
+                marker.showInfoWindow();
           });
-          marker.setIcon(that.styles[that.styleIndex]);
-          marker.setMap(that.map);
-          that.map.setCenter(marker.getPosition());
-          document.getElementById("startInput").innerHTML = "abc";
+          that.map.moveCamera(position);
           return new Promise((resolve, reject) => {
              resolve();
           });
@@ -125,20 +139,23 @@ export class HomePage {
     callback: function(_params) {
           if(typeof _params == "undefined")
           return;
-          var latLng = new google.maps.LatLng(_params.latitude, _params.longtitude);
-          let mapOptions = {
-              center: latLng,
-              zoom: 15,
-              mapTypeId: google.maps.MapTypeId.ROADMAP
-          }
+          let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(_params.latitude, _params.longtitude);
+          let position: CameraPosition = {
+                target: latLng,
+                zoom: 18,
+                tilt: 30
+          };
           that.lastPos = latLng;
-          var marker = new google.maps.Marker({
-            position: latLng
+          let markerOptions: GoogleMapsMarkerOptions = {
+                position: this.map.getCameraPosition(),
+                title: 'Ionic',
+                icon: this.styles[this.styleIndex]
+          };
+          that.map.addMarker(markerOptions)
+          .then((marker: GoogleMapsMarker) => {
+                marker.showInfoWindow();
           });
-          marker.setIcon(that.styles[that.styleIndex]);
-          marker.setMap(that.map);
-          that.map.setCenter(marker.getPosition());
-          document.getElementById("startInput").innerHTML = "abc";
+          that.map.moveCamera(position);
           return new Promise((resolve, reject) => {
              resolve();
           });
@@ -147,10 +164,10 @@ export class HomePage {
   }
 
   calculate(){
-      this.calculateBetweenPoint(this.beforePos, this.lastPos);
+    //  this.calculateBetweenPoint(this.beforePos, this.lastPos);
   }
 
-  calculateBetweenPoint(pos1, pos2){
+  calculateBetweenPoint(pos1, pos2){/*
     var directionsService = new google.maps.DirectionsService();
     var directionsDisplay = new google.maps.DirectionsRenderer(); 
     directionsDisplay.setMap(this.map);    
@@ -183,18 +200,20 @@ export class HomePage {
 
         } else {
         }
-    });
+    });*/
   }
 
   loadMap() { 
-    var latLng = new google.maps.LatLng(16.0397912, 108.2254014);
-    let mapOptions = {
-        center: latLng,
-        zoom: 15,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    }
-    var div = document.getElementById("map");
-    this.map = plugin.google.maps.Map.getMap(div);
-    
+    let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
+    let element: HTMLElement = document.getElementById('map');
+    this.map = new GoogleMap(element);
+    this.map.one(GoogleMapsEvent.MAP_READY).then(() => {
+        let position: CameraPosition = {
+            target: latLng,
+            zoom: 18,
+            tilt: 30
+        };
+        this.map.moveCamera(position);
+    });
   }
 }
