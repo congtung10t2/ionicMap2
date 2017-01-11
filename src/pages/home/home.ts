@@ -2,6 +2,7 @@ import { Component, ViewChild, ElementRef } from '@angular/core';
 
 import { NavController, ModalController, NavParams } from 'ionic-angular';
 import { SearchListPage } from '../search-list/search-list';
+import {Camera, ImagePicker} from 'ionic-native';
 
 declare var google;
 @Component({
@@ -14,6 +15,7 @@ export class HomePage {
   styles: any;
   beforePos: any;
   lastPos: any;
+  public base64Image: string;
   @ViewChild('map') mapElement: ElementRef;
   map: any;
   constructor(public navCtrl: NavController, params: NavParams) {
@@ -56,6 +58,30 @@ export class HomePage {
         });
         curPos.setIcon(this.styles[this.styleIndex]);
         curPos.setMap(this.map);
+  }
+
+  takePicture(){
+    var that = this;
+    Camera.getPicture({
+        destinationType: Camera.DestinationType.DATA_URL,
+        targetWidth: 1000,
+        targetHeight: 1000
+    }).then((imageData) => {
+      // imageData is a base64 encoded string
+        that.base64Image = "data:image/jpeg;base64," + imageData;
+    }, (err) => {
+        console.log(err);
+    });
+  }
+
+  choosePicture(){
+    var that = this;
+    let options = {
+        maximumImagesCount: 1,
+    }
+    ImagePicker.getPictures(options).then((results) => {
+        that.base64Image = results[0];
+    }, (err) => { });
   }
   
   changeStyleOfMarker(){
@@ -167,7 +193,8 @@ export class HomePage {
         zoom: 15,
         mapTypeId: google.maps.MapTypeId.ROADMAP
     }
-    this.map = new google.maps.Map(this.mapElement.nativeElement, mapOptions);
+    var div = document.getElementById("map");
+    this.map = plugin.google.maps.Map.getMap(div);
     
   }
 }
