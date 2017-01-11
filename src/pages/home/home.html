@@ -31,5 +31,14 @@
         <ion-label id="distance">Distance: </ion-label>
         <ion-label id="duration">Duration: </ion-label>
     </div>
+    <div class = "avatar">
+        <div class = "avatarchoose">
+            <button (click)="takePicture()">Take a Picture</button>
+            <button (click)="choosePicture()">Image pick</button>
+        </div>
+    </div>
+    <div>
+     <img [src]="base64Image" *ngIf="base64Image" />
+    </div>
     <div #map id="map"></div>
 </ion-content>
