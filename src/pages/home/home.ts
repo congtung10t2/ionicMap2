@@ -38,32 +38,27 @@ export class HomePage {
   }
 
   currentLocation(){
-    var that = this;
-    var setCurrentPos = function(latitude, longitude){
-        var latLong = new google.maps.LatLng(latitude, longitude);
-        var curPos = new google.maps.Marker({
-            position: latLong
+    this.map.getMyLocation(function(location) {
+        var msg = ["Current your location:\n",
+            "latitude:" + location.latLng.lat,
+            "longitude:" + location.latLng.lng,
+            "speed:" + location.speed,
+            "time:" + location.time,
+            "bearing:" + location.bearing].join("\n");
+
+        this.map.addMarker({
+            'position': location.latLng,
+            'title': msg
+        }, function(marker) {
+            marker.showInfoWindow();
         });
-        curPos.setMap(that.map);
-        that.map.setCenter(curPos.getPosition());
-    }
-    var onMapSuccess = function (position) {
-        var Latitude = position.coords.latitude;
-        var Longitude = position.coords.longitude;
-        setCurrentPos(Latitude, Longitude);
-    }
-    var onMapError =  function(error) {
-        console.log('code: ' + error.code + '\n' +
-        'message: ' + error.message + '\n');
-    }
-    navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: false });
+    });
   }
 
   setTargetLocation(){
     let markerOptions: GoogleMapsMarkerOptions = {
         position: this.map.getCameraPosition(),
-        title: 'Ionic',
-        icon: this.styles[this.styleIndex]
+        title: 'Ionic'
     };
     this.map.addMarker(markerOptions)
     .then((marker: GoogleMapsMarker) => {
@@ -96,7 +91,7 @@ export class HomePage {
   }
   
   changeStyleOfMarker(){
-    if(this.styleIndex < this.styles.length){
+    if(this.styleIndex < this.styles.length-1){
         this.styleIndex++;
     }
     else 
@@ -117,9 +112,11 @@ export class HomePage {
           };
           that.beforePos = latLng;
           let markerOptions: GoogleMapsMarkerOptions = {
-                position: this.map.getCameraPosition(),
+                position: latLng,
                 title: 'Ionic',
-                icon: this.styles[this.styleIndex]
+                icon: {
+                    'url': that.styles[that.styleIndex]
+                }
           };
           that.map.addMarker(markerOptions)
           .then((marker: GoogleMapsMarker) => {
@@ -147,9 +144,11 @@ export class HomePage {
           };
           that.lastPos = latLng;
           let markerOptions: GoogleMapsMarkerOptions = {
-                position: this.map.getCameraPosition(),
+                position: latLng,
                 title: 'Ionic',
-                icon: this.styles[this.styleIndex]
+                icon: {
+                    'url': that.styles[that.styleIndex]
+                }
           };
           that.map.addMarker(markerOptions)
           .then((marker: GoogleMapsMarker) => {
@@ -164,24 +163,39 @@ export class HomePage {
   }
 
   calculate(){
-    //  this.calculateBetweenPoint(this.beforePos, this.lastPos);
+      this.calculateBetweenPoint(this.beforePos, this.lastPos);
   }
 
-  calculateBetweenPoint(pos1, pos2){/*
+  calculateBetweenPoint(pos1, pos2){
     var directionsService = new google.maps.DirectionsService();
-    var directionsDisplay = new google.maps.DirectionsRenderer(); 
-    directionsDisplay.setMap(this.map);    
+    var service = new google.maps.DistanceMatrixService();
+    var that = this;
     var request = {
-        origin:pos1,
-        destination:pos2,
-        travelMode: google.maps.TravelMode.DRIVING
+                 origin:pos1,
+                 destination:pos2,
+                 travelMode: google.maps.TravelMode.DRIVING
     };
     directionsService.route(request, function(response, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setDirections(response);
+    if (status == google.maps.DirectionsStatus.OK) {
+        var steps : Array<GoogleMapsLatLng>;
+        steps = [];
+        var result = response.routes[0].legs[0].steps;
+        for (var element in result){
+                steps.push(new GoogleMapsLatLng(result[element].start_location.lat, result[element].start_location.lng));
         }
+        steps.push(new GoogleMapsLatLng(response.routes[0].legs[0].end_location.lat, response.routes[0].legs[0].end_location.lng));
+        that.map.addPolyline({
+                points: steps,
+                'color' : '#AA00FF',
+                'width': 10,
+                'geodesic': true
+            }, function(polyline) {
+                    setTimeout(function() {
+                    polyline.remove();
+                    }, 3000);
+            });
+    }
     });
-    var service = new google.maps.DistanceMatrixService();
     service.getDistanceMatrix({
         origins: [pos1],
         destinations: [pos2],
@@ -200,20 +214,23 @@ export class HomePage {
 
         } else {
         }
-    });*/
+    });
   }
 
   loadMap() { 
-    let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
-    let element: HTMLElement = document.getElementById('map');
-    this.map = new GoogleMap(element);
-    this.map.one(GoogleMapsEvent.MAP_READY).then(() => {
-        let position: CameraPosition = {
-            target: latLng,
-            zoom: 18,
-            tilt: 30
-        };
-        this.map.moveCamera(position);
+    var that = this;
+    document.addEventListener("deviceready", function() {
+        let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
+        let element: HTMLElement = document.getElementById('map');
+        that.map = new GoogleMap(element);
+        that.map.one(GoogleMapsEvent.MAP_READY).then(() => {
+            let position: CameraPosition = {
+                target: latLng,
+                zoom: 18,
+                tilt: 30
+            };
+            that.map.moveCamera(position);
+        });
     });
   }
 }
