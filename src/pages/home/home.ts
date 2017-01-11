@@ -38,25 +38,22 @@ export class HomePage {
   }
 
   currentLocation(){
-    var that = this;
-    var setCurrentPos = function(latitude, longitude){
-        var latLong = new google.maps.LatLng(latitude, longitude);
-        var curPos = new google.maps.Marker({
-            position: latLong
+    this.map.getMyLocation(function(location) {
+        var msg = ["Current your location:\n",
+            "latitude:" + location.latLng.lat,
+            "longitude:" + location.latLng.lng,
+            "speed:" + location.speed,
+            "time:" + location.time,
+            "bearing:" + location.bearing].join("\n");
+
+        this.map.addMarker({
+            'position': location.latLng,
+            'title': msg,
+            'icon': this.styles[this.styleIndex]
+        }, function(marker) {
+            marker.showInfoWindow();
         });
-        curPos.setMap(that.map);
-        that.map.setCenter(curPos.getPosition());
-    }
-    var onMapSuccess = function (position) {
-        var Latitude = position.coords.latitude;
-        var Longitude = position.coords.longitude;
-        setCurrentPos(Latitude, Longitude);
-    }
-    var onMapError =  function(error) {
-        console.log('code: ' + error.code + '\n' +
-        'message: ' + error.message + '\n');
-    }
-    navigator.geolocation.getCurrentPosition(onMapSuccess, onMapError, { enableHighAccuracy: false });
+    });
   }
 
   setTargetLocation(){
@@ -117,7 +114,7 @@ export class HomePage {
           };
           that.beforePos = latLng;
           let markerOptions: GoogleMapsMarkerOptions = {
-                position: this.map.getCameraPosition(),
+                position: latLng,
                 title: 'Ionic',
                 icon: this.styles[this.styleIndex]
           };
@@ -147,7 +144,7 @@ export class HomePage {
           };
           that.lastPos = latLng;
           let markerOptions: GoogleMapsMarkerOptions = {
-                position: this.map.getCameraPosition(),
+                position: latLng,
                 title: 'Ionic',
                 icon: this.styles[this.styleIndex]
           };
