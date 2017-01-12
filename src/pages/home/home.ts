@@ -39,6 +39,7 @@ export class HomePage {
   }
 
   currentLocation(){
+    var that = this;
     this.map.getMyLocation(function(location) {
         var msg = ["Current your location:\n",
             "latitude:" + location.latLng.lat,
@@ -46,8 +47,13 @@ export class HomePage {
             "speed:" + location.speed,
             "time:" + location.time,
             "bearing:" + location.bearing].join("\n");
-
-        this.map.addMarker({
+        let position: CameraPosition = {
+                target: location.latLng,
+                zoom: 18,
+                tilt: 30
+          };
+        that.map.moveCamera(position);
+        that.map.addMarker({
             'position': location.latLng,
             'title': msg
         }, function(marker) {
