@@ -1,6 +1,6 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { Http } from '@angular/http';
-import { NavController, ModalController, NavParams } from 'ionic-angular';
+import { NavController, ModalController, NavParams, Events } from 'ionic-angular';
 import { SearchListPage } from '../search-list/search-list';
 import {Camera, 
  ImagePicker,
@@ -27,12 +27,19 @@ export class HomePage {
   endInputModel: any;
   public base64Image: string;
   map: any;
-  constructor(public navCtrl: NavController, params: NavParams, public http: Http) {
+  constructor(public navCtrl: NavController, params: NavParams, public http: Http, public events: Events) {
       this.styleIndex = 0;
       this.styles = [
         "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png",
         "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png"
       ];
+      var that = this;
+      this.events.subscribe('menu:opened', () => {
+        that.map.setClickable(false);
+      });
+      this.events.subscribe('menu:closed', () => {
+        that.map.setClickable(true);
+      });
   }
 
   ionViewDidLoad() {
@@ -230,6 +237,20 @@ export class HomePage {
             };
             that.map.moveCamera(position);
         });
+    });
+    var evtName = plugin.google.maps.event.MAP_LONG_CLICK;
+    this.map.on(evtName, function(latLng) {
+           let markerOptions: GoogleMapsMarkerOptions = {
+                position: latLng,
+                title: "just clicked",
+                icon: {
+                    'url': that.styles[that.styleIndex]
+                }
+          };
+          that.map.addMarker(markerOptions)
+          .then((marker: GoogleMapsMarker) => {
+                marker.showInfoWindow();
+          });
     });
   }
 }

@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-import { Nav, Platform } from 'ionic-angular';
+import { Nav, Platform, Events } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 
 import { HomePage } from '../pages/home/home';
@@ -18,7 +18,7 @@ export class MyApp {
 
     pages: any;
 
-  constructor(platform: Platform) {
+  constructor(platform: Platform, public events: Events) {
     this.pages = [
         "page 1",
         "page 2"
@@ -29,5 +29,12 @@ export class MyApp {
       StatusBar.styleDefault();
       Splashscreen.hide();
     });
+  }
+  menuOpened(){
+      this.events.publish('menu:opened');
+  }
+
+  menuClosed(){
+      this.events.publish('menu:closed');
   }
 }
