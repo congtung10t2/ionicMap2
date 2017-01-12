@@ -1,5 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
-
+import { Http } from '@angular/http';
 import { NavController, ModalController, NavParams } from 'ionic-angular';
 import { SearchListPage } from '../search-list/search-list';
 import {Camera, 
@@ -12,6 +12,7 @@ import {Camera,
  GoogleMapsMarker} from 'ionic-native';
 
 declare var google;
+declare var plugin;
 @Component({
     selector: 'home-page',
     templateUrl: 'home.html'
@@ -25,7 +26,7 @@ export class HomePage {
   public base64Image: string;
   @ViewChild('map') mapElement: ElementRef;
   map: any;
-  constructor(public navCtrl: NavController, params: NavParams) {
+  constructor(public navCtrl: NavController, params: NavParams, public http: Http) {
       this.styleIndex = 0;
       this.styles = [
         "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png",
@@ -166,36 +167,29 @@ export class HomePage {
       this.calculateBetweenPoint(this.beforePos, this.lastPos);
   }
 
+  drawPolygon(encodedPolygon) : any {
+    var precision = 5; //option
+    this.map.addPolyline({
+        points: plugin.google.maps.geometry.encoding.decodePath(encodedPolygon, precision),
+        'color' : '#AA00FF',
+        'width': 10,
+        'geodesic': true
+    });
+  }
+        
+
   calculateBetweenPoint(pos1, pos2){
-    var directionsService = new google.maps.DirectionsService();
     var service = new google.maps.DistanceMatrixService();
     var that = this;
-    var request = {
-                 origin:pos1,
-                 destination:pos2,
-                 travelMode: google.maps.TravelMode.DRIVING
-    };
-    directionsService.route(request, function(response, status) {
-    if (status == google.maps.DirectionsStatus.OK) {
-        var steps : Array<GoogleMapsLatLng>;
-        steps = [];
-        var result = response.routes[0].legs[0].steps;
-        for (var element in result){
-                steps.push(new GoogleMapsLatLng(result[element].start_location.lat, result[element].start_location.lng));
-        }
-        steps.push(new GoogleMapsLatLng(response.routes[0].legs[0].end_location.lat, response.routes[0].legs[0].end_location.lng));
-        that.map.addPolyline({
-                points: steps,
-                'color' : '#AA00FF',
-                'width': 10,
-                'geodesic': true
-            }, function(polyline) {
-                    setTimeout(function() {
-                    polyline.remove();
-                    }, 3000);
-            });
-    }
-    });
+    this.http.get("https://maps.googleapis.com/maps/api/directions/json?origin="+pos1.lat+","+pos1.lng+"&destination="+pos2.lat+","+pos2.lng+"&mode=driving&key=AIzaSyBcvJyg8uQtgxPH9lPV-criyVkb_49akXo")
+        .subscribe(data => {
+            var result = data.json().routes[0].legs[0].steps;
+            for(var i = 0; i < result.length; i++){
+                that.drawPolygon(result[i].polyline.points);
+            }
+        }, error => {
+            console.log(JSON.stringify(error.json()));
+        });
     service.getDistanceMatrix({
         origins: [pos1],
         destinations: [pos2],
@@ -226,8 +220,7 @@ export class HomePage {
         that.map.one(GoogleMapsEvent.MAP_READY).then(() => {
             let position: CameraPosition = {
                 target: latLng,
-                zoom: 18,
-                tilt: 30
+                zoom: 15
             };
             that.map.moveCamera(position);
         });
