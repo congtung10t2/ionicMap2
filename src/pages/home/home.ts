@@ -224,33 +224,43 @@ export class HomePage {
     });
   }
 
-  loadMap() { 
-    var that = this;
-    document.addEventListener("deviceready", function() {
-        let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
-        let element: HTMLElement = document.getElementById('map');
-        that.map = new GoogleMap(element);
-        that.map.one(GoogleMapsEvent.MAP_READY).then(() => {
-            let position: CameraPosition = {
-                target: latLng,
-                zoom: 15
-            };
-            that.map.moveCamera(position);
-        });
-    });
+  initMap(map){
+    this.map = map;
+    let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
+    let position: CameraPosition = {
+        target: latLng,
+        zoom: 15
+    };
+    map.moveCamera(position);
     var evtName = plugin.google.maps.event.MAP_LONG_CLICK;
-    this.map.on(evtName, function(latLng) {
-           let markerOptions: GoogleMapsMarkerOptions = {
+    var that = this;
+    map.on(evtName, function(latLng) {
+
+        let markerOptions: GoogleMapsMarkerOptions = {
                 position: latLng,
                 title: "just clicked",
                 icon: {
                     'url': that.styles[that.styleIndex]
                 }
-          };
-          that.map.addMarker(markerOptions)
-          .then((marker: GoogleMapsMarker) => {
+        };
+        map.addMarker(markerOptions)
+        .then((marker: GoogleMapsMarker) => {
                 marker.showInfoWindow();
-          });
+        });
     });
   }
+   
+  loadMap() { 
+    var that = this;
+    document.addEventListener("deviceready", function() {
+        let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
+        let element: HTMLElement = document.getElementById('map');
+        var map = plugin.google.maps.Map.getMap(element);
+        map.on(plugin.google.maps.event.MAP_READY, function(mapEvent) {
+            that.initMap(mapEvent);
+        });
+    });
+    
+  }
+  
 }
