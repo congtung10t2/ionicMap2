@@ -224,30 +224,28 @@ export class HomePage {
     });
   }
 
-  initMap(map){
-    this.map = map;
+  initMap(){
     let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
     let position: CameraPosition = {
         target: latLng,
         zoom: 15
     };
-    map.moveCamera(position);
-    var evtName = plugin.google.maps.event.MAP_LONG_CLICK;
+    this.map.moveCamera(position);
+    var evtName = GoogleMapsEvent.MAP_LONG_CLICK;
     var that = this;
-    map.on(evtName, function(latLng) {
-
-        let markerOptions: GoogleMapsMarkerOptions = {
-                position: latLng,
+    this.map.on(GoogleMapsEvent.MAP_CLICK).subscribe((pos) => {
+            let markerOptions: GoogleMapsMarkerOptions = {
+                position: pos,
                 title: "just clicked",
                 icon: {
                     'url': that.styles[that.styleIndex]
                 }
-        };
-        map.addMarker(markerOptions)
-        .then((marker: GoogleMapsMarker) => {
-                marker.showInfoWindow();
+            };
+            that.map.addMarker(markerOptions)
+            .then((marker: GoogleMapsMarker) => {
+                    marker.showInfoWindow();
+            });
         });
-    });
   }
    
   loadMap() { 
@@ -255,9 +253,9 @@ export class HomePage {
     document.addEventListener("deviceready", function() {
         let latLng: GoogleMapsLatLng = new GoogleMapsLatLng(43.0741904,-89.3809802);
         let element: HTMLElement = document.getElementById('map');
-        var map = plugin.google.maps.Map.getMap(element);
-        map.on(plugin.google.maps.event.MAP_READY, function(mapEvent) {
-            that.initMap(mapEvent);
+        that.map = new GoogleMap(element);
+        that.map.on(GoogleMapsEvent.MAP_READY).subscribe(() => {
+            that.initMap();
         });
     });
     
