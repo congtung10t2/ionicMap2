@@ -50,7 +50,7 @@ export class SearchListPage {
                 var lat = responses[0].geometry.location.lat();
                 var lng = responses[0].geometry.location.lng();
                 //console.log(lat, lng);
-                that.callback({latitude: lat, longtitude: lng}).then(()=>{
+                that.callback({latitude: lat, longtitude: lng, description: item.description}).then(()=>{
                     that.navCtrl.pop();
                 });
             }

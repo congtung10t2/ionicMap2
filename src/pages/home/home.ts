@@ -23,8 +23,9 @@ export class HomePage {
   styles: any;
   beforePos: any;
   lastPos: any;
+  startInputModel: any;
+  endInputModel: any;
   public base64Image: string;
-  @ViewChild('map') mapElement: ElementRef;
   map: any;
   constructor(public navCtrl: NavController, params: NavParams, public http: Http) {
       this.styleIndex = 0;
@@ -36,6 +37,14 @@ export class HomePage {
 
   ionViewDidLoad() {
     this.loadMap();
+  }
+
+  get startInput(){
+      return this.startInputModel;
+  }
+
+  get endInput(){
+      return this.endInputModel;
   }
 
   currentLocation(){
@@ -106,10 +115,11 @@ export class HomePage {
                 zoom: 18,
                 tilt: 30
           };
+          that.startInputModel = _params.description;
           that.beforePos = latLng;
           let markerOptions: GoogleMapsMarkerOptions = {
                 position: latLng,
-                title: 'Ionic',
+                title: _params.description,
                 icon: {
                     'url': that.styles[that.styleIndex]
                 }
@@ -139,9 +149,10 @@ export class HomePage {
                 tilt: 30
           };
           that.lastPos = latLng;
+          that.endInputModel = _params.description;
           let markerOptions: GoogleMapsMarkerOptions = {
                 position: latLng,
-                title: 'Ionic',
+                title: _params.description,
                 icon: {
                     'url': that.styles[that.styleIndex]
                 }

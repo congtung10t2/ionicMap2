@@ -3,11 +3,12 @@
         <button ion-button menuToggle>
             <ion-icon name="menu"></ion-icon>
         </button>
-    <label class="item-input-wrapper">
+    <div class="item-input-wrapper">
         <i class="icon ion-ios7-search placeholder-icon"></i>
-        <input id="startInput" type="search" (click)='openStart();' placeholder="Start">
-        <input id="endInput" type="search" (click)='openEnd();' placeholder="Target">
-    </label>
+        <input id="startInput" type="text" (click)='openStart()' [(ngModel)]="startInput" placeholder="Start"/>
+        <input id="endInput" type="text" (click)='openEnd()' [(ngModel)]="endInput" placeholder="Target"/>
+    </div>
+    
     </ion-navbar>
 </ion-header>
 
