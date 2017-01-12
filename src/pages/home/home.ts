@@ -56,17 +56,6 @@ export class HomePage {
     });
   }
 
-  setTargetLocation(){
-    let markerOptions: GoogleMapsMarkerOptions = {
-        position: this.map.getCameraPosition(),
-        title: 'Ionic'
-    };
-    this.map.addMarker(markerOptions)
-    .then((marker: GoogleMapsMarker) => {
-        marker.showInfoWindow();
-    });
-  }
-
   takePicture(){
     var that = this;
     Camera.getPicture({
