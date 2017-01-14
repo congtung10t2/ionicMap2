@@ -3,7 +3,7 @@
     home-page {
  
       .scroll-content {
-        height: 100%
+        overflow: hidden;
       }
  
       #map {
