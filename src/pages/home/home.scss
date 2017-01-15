@@ -1,6 +1,7 @@
 .ios, .md {
  
     home-page {
+      display: flex;
  
       .scroll-content {
         overflow: hidden;
@@ -8,7 +9,43 @@
  
       #map {
         width: 100%;
-        height: 100%;
+        height: 55%;
+      }
+
+      .tabbar-bottom{
+         width: 100%;
+         background-color: #f4df42;
+         display: flex;
+         font-size: 10px;
+         line-height: 10px; // Add
+          align-items:flex-end;
+          align-content: flex-end; /* new */
+      }
+      .tabbar-bottom .tab-child{
+        width: 100%;
+        background-color: #f4df42;
+        border-color: #f4df42;
+        height: 20%;
+        margin: 0px;
+        vertical-align: top;
+        text-align: center; // Add
+      }
+
+      .tabbar-bottom .tab-child span{
+         display: block;
+         background-color: #f4df42;
+         border-color: #f4df42;
+         box-shadow: #f4df42;
+         border-style: solid;
+      
+         font-size: 15px;
+      }
+      .tabbar-bottom .tab-child .icon{
+          border-color: #f4df42;
+          display: block;
+          left: 50px;
+          font-size: 30px;
+          margin-bottom: 3px !important;
       }
  
     }
