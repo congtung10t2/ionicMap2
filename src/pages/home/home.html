@@ -1,14 +1,60 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>
-      Ionic Blank
-    </ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+    <div class="item-input-wrapper">
+        <i class="icon ion-ios7-search placeholder-icon"></i>
+        <input id="startInput" type="text" (click)='openStart()' [(ngModel)]="startInput" placeholder="Start"/>
+        <input id="endInput" type="text" (click)='openEnd()' [(ngModel)]="endInput" placeholder="Target"/>
+    </div>
+    
+    </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  The world is your oyster.
-  <p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+<div class="bar bar-header">
+  <button class="button button-icon icon ion-navicon"></button>
+  <div class="h1 title">Header Buttons</div>
+  <button class="button button-clear button-positive">Edit</button>
+</div>
+<ion-content>
+    <div class = "tabs">
+        <button ion-button (click)='currentLocation();'>now</button>
+            
+        <button ion-button (click)='changeStyleOfMarker();'>change marker style</button>
+
+        <button ion-button (click)='calculate();'>calculate</button>
+    </div>
+    <div class = "show">
+        
+        <ion-label id="distance">Distance: </ion-label>
+        <ion-label id="duration">Duration: </ion-label>
+    </div>
+    <div class = "avatar">
+        <div class = "avatarchoose">
+            <button (click)="takePicture()">Take a Picture</button>
+            <button (click)="choosePicture()">Image pick</button>
+        </div>
+    </div>
+    <div>
+     <img [src]="base64Image" *ngIf="base64Image" />
+    </div>
+    <div #map id="map"></div>
+    <div class="tabbar-bottom">
+        <button ion-button color="danger" class="tab-child">
+            <ion-icon name="home" class="icon"></ion-icon>
+            <span>Danger</span></button>
+        <button ion-button color="danger" class="tab-child">
+            <ion-icon name="home" class="icon"></ion-icon>
+            <span>Danger</span></button>
+        <button ion-button color="danger" class="tab-child">
+            <ion-icon name="home" class="icon"></ion-icon>
+            <span>Danger</span></button>
+        <button ion-button color="danger" class="tab-child">
+            <ion-icon name="home" class="icon"></ion-icon>
+            <span>Danger</span></button>
+        <button ion-button color="danger" class="tab-child">
+            <ion-icon name="home" class="icon"></ion-icon>
+            <span>Danger</span></button>
+    </div>
 </ion-content>
